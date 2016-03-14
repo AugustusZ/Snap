@@ -14,10 +14,18 @@ def getLatestImgName():
 def copyToServer(fileToCopy):
 	os.system('scp "%s" "%s:%s"' % (os.path.join(SRC_DIR, fileToCopy), HOST, DEST_PATH))
 
+def enhenceImage(imageFileName):
+	# visually enhence the snap image before upload it
+	# 1. read in as matrix
+	# 2. enhence it
+	# 3. save it
+	pass
+
 def sendIfUpdated(originalFile):
 	latest = getLatestImgName()
 	if not latest or latest == originalFile: 
 		return False
+	enhenceImage(latest)
 	copyToServer(latest)
 	return latest
 
