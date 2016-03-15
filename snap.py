@@ -3,7 +3,8 @@ import os, time, cv2, copy
 SRC_DIR = "/Users/Augustus/Dropbox/Wake Images"
 HOST = "yankuanz@aludra.usc.edu"
 DEST_PATH = "/home/scf-09/yankuanz/public_html/snap/latest.jpg"
-
+SCRIPT_DIR = "/Users/Augustus/Documents/snap"
+ENHENCED_IMG_NAME = "enhenced.jpg"
 # get the most recent file name from SRC_DIR
 def getLatestImgName():
 	mtime = lambda f: os.stat(os.path.join(SRC_DIR, f)).st_mtime
@@ -20,8 +21,10 @@ def copyToServer(fileToCopy):
 	os.system('scp "%s" "%s:%s"' % (os.path.join(SRC_DIR, fileToCopy), HOST, DEST_PATH))
 	# delete the file from local after uploading it
 	# otherwise, it will mess up with getLatestImgName()
+	# print fileToCopy
+	# if fileToCopy == "upload":
+	time.sleep(3)
 	os.system('rm "%s"' % (os.path.join(SRC_DIR, fileToCopy)))
-	
 
 # enhence image before upload it and return new filename if any
 def enhenceImage(imageFileName):
@@ -35,23 +38,21 @@ def enhenceImage(imageFileName):
 		equ[:,:,b] = cv2.equalizeHist(img[:,:,b])
 
 	# 3. detect and mark face(s)
-	face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+	face_cascade = cv2.CascadeClassifier(os.path.join(SCRIPT_DIR, 'haarcascade_frontalface_default.xml'))
 	gray = cv2.cvtColor(equ, cv2.COLOR_BGR2GRAY)
 	faces = face_cascade.detectMultiScale(gray, 1.025 , 3, minSize=(180, 180))
 	if len(faces) > 0:
 		for i,(x,y,w,h) in enumerate(faces):
 			cv2.rectangle(img,(x,y),(x+w,y+h),(0,255,0),2)
 		# 4. save it
-		newImageFileName = "uploaded_" + imageFileName
-		cv2.imwrite(os.path.join(SRC_DIR, newImageFileName), img)
-		return newImageFileName
-	return imageFileName
+	cv2.imwrite(os.path.join(SRC_DIR, ENHENCED_IMG_NAME), img)
 
 def sendIfUpdated(originalFile):
 	latest = getLatestImgName()
 	if not latest or latest == originalFile: 
 		return False
-	copyToServer(enhenceImage(latest))
+	enhenceImage(latest)
+	copyToServer(ENHENCED_IMG_NAME)
 	return latest
 
 lastFile = None
@@ -62,4 +63,4 @@ while True:
 		lastFile = result
 	# else:
 	# 	print("Nothing new. Latest: {}".format(lastFile))
-	time.sleep(9)
+	time.sleep(5)
