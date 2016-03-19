@@ -1,4 +1,9 @@
 import os, time, cv2, copy
+import smtplib
+import email.utils
+from email.mime.text import MIMEText
+from email.mime.image import MIMEImage
+from email.mime.multipart import MIMEMultipart
 
 SRC_DIR = "/Users/Augustus/Dropbox/Wake Images"
 HOST = "yankuanz@aludra.usc.edu"
@@ -7,9 +12,12 @@ SCRIPT_DIR = "/Users/Augustus/Documents/snap"
 ENHENCED_IMG_NAME = "enhenced.jpg"
 CROPPED_IMG_NAME = "cropped.jpg"
 SENT_IMG_NAME = "LatestSnap.jpg"
-RECEIVER = "yankuanz@usc.edu"
 SUBJECT = "This is my latest selfie!"
 RUNNING_LIMIT = 6 * 60 * 24 * 7 # one week
+
+FROM = "yankuanz@usc.edu"
+TO = ["yankuanz@usc.edu"] # which is a list
+SUBJECT = "This is my latest selfie!"
 
 # get the most recent file name from SRC_DIR
 def getLatestImgName():
@@ -39,6 +47,7 @@ def enhenceImage(imageFileName):
 	print "Process:", os.path.join(SRC_DIR, imageFileName)
 	img = cv2.imread(os.path.join(SRC_DIR, imageFileName))
 	img = img[:, 280:1000, :] #crop in the middle
+	cv2.imwrite(os.path.join(SCRIPT_DIR, CROPPED_IMG_NAME), img) # for email
 
 	# 2. enhence it by equalizing the histogram of three bands
 	equ = copy.deepcopy(img)
@@ -56,15 +65,37 @@ def enhenceImage(imageFileName):
 	# 4. save it
 	print "Save to:", os.path.join(SCRIPT_DIR, ENHENCED_IMG_NAME)
 	cv2.imwrite(os.path.join(SCRIPT_DIR, ENHENCED_IMG_NAME), img) # for webpage
-	cv2.imwrite(os.path.join(SCRIPT_DIR, CROPPED_IMG_NAME), img) # for email
 	time.sleep(1)
 
 # email original image
 def sendEmail(imageFileName):
-	# os.system('uuencode %s "%s" | mail -s "%s" %s' % (os.path.join(SRC_DIR, imageFileName), imageFileName, SUBJECT, RECEIVER))
 	print "Email", os.path.join(SCRIPT_DIR, imageFileName), "to", RECEIVER
-	os.system('(echo "%s"; uuencode %s "%s") | mail -s "%s" %s' % ("This snap is taken at " + time.strftime('%X %x') + '.\n', os.path.join(SCRIPT_DIR, imageFileName), imageFileName, SUBJECT, RECEIVER))  
-	# os.system('(echo %s; uuencode %s "%s") | mail -s "%s" %s' % ("This snap is taken at " + time.strftime('%X %x'), os.path.join(SCRIPT_DIR, imageFileName), "snap.jpg", SUBJECT, RECEIVER))  
+
+	# Create the message
+	# Create the container (outer) email message.
+	msg = MIMEMultipart()
+	msg['To'] = email.utils.formataddr((TO[0].split("@")[0], TO[0]))
+	msg['From'] = email.utils.formataddr(('Yankuan', FROM))
+	msg['Subject'] = SUBJECT
+
+	# body text
+	body = MIMEText("This snap is taken at " + time.strftime('%X %x') + '.\n')
+	msg.attach(body)
+
+	# attached image
+	fp = open(imageFileName, 'rb')
+	img = MIMEImage(fp.read())
+	fp.close()
+	msg.attach(img)
+
+	server = smtplib.SMTP('mail')
+	# server.set_debuglevel(True) # show communication with the server
+	try:
+		server.sendmail(FROM, TO, msg.as_string())
+	finally:
+		server.quit()
+	
+	# os.system('(echo "%s"; uuencode %s "%s") | mail -s "%s" %s' % ("This snap is taken at " + time.strftime('%X %x') + '.\n', os.path.join(SCRIPT_DIR, imageFileName), imageFileName, SUBJECT, TO[0]))  
 
 def sendIfUpdated(originalFile):
 	latest = getLatestImgName()
