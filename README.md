@@ -17,13 +17,15 @@ It detects faces with **Haar Feature-based Cascade Classifiers** in OpenCV with 
 -  `minSize`: 30 x 30
 
 ## Send Emails
-On Mar 18, my VIP user, AKA my dear mom, complained to me about the webpage loading really slow, and I assume this is because the server and the user are *kinda* across the Pacific. So I added the functionality of sending emails in script.
+On Mar 18, my VIP user, AKA my dear mom, complained to me about the webpage loading really slow, and I assume this is because the server and the user are *kinda* across the Pacific. So I added the functionality of sending emails in script. (Well, these aren't always working and I am still trying to figure them out)
 
+### Use command `mail`
 What I used is the command `mail` with `uuencode` to attach the image:
 	
 	os.system('(echo "%s"; uuencode %s "%s") | mail -s "%s" %s' % ("This snap is taken at " + time.strftime('%X %x') + '.\n', os.path.join(SCRIPT_DIR, imageFileName), imageFileName, SUBJECT, RECEIVER))  
-	
-And a `RECEIVER` will get something like:
+
+### Use Python packages `smtplib` and `email.mime`
+[An example](https://docs.python.org/2/library/email-examples.html) on python.org and a `RECEIVER` will get something like:
 
 ![Email Sample](emaildemo.png)
 
