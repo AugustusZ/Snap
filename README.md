@@ -25,7 +25,7 @@ What I used is the command `mail` with `uuencode` to attach the image:
 	
 And a `RECEIVER` will get something like:
 
-![Email Sample](emailsample.png)
+![Email Sample](emaildemo.png)
 
 ## Self-terminate
 The application will self-terminate (uhh, there must be a better word) in **a week** from the moment it starts to run. I just feel like it is the right thing to this.
