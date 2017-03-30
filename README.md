@@ -2,7 +2,9 @@
 
 *This project is for my mom for her missing me and wanna see my face.* ❤️
 
-Click [here](http://www-scf.usc.edu/~yankuanz/snap/) to see the **Most recent guy using my Mac**.
+A Snap (this Snap, not the Snapchat Snap) subscriber (AKA my mother) will receive an email containing a snapshot of me once I open my Mac lid, and everyone can also open up this <s>[link](http://www-scf.usc.edu/~yankuanz/snap/)</s> (down for now) to see the **Most recent guy using my Mac**. 
+
+Via the link, a visiter can see:
 
 ![Demo](demo.png)
 
@@ -17,7 +19,7 @@ It detects faces with **Haar Feature-based Cascade Classifiers** in OpenCV with 
 -  `minSize`: 30 x 30
 
 ## Send Emails
-On Mar 18, my VIP user, AKA my dear mom, complained to me about the webpage loading really slow, and I assume this is because the server and the user are *kinda* across the Pacific. So I added the functionality of sending emails in script. (Well, these aren't always working and I am still trying to figure them out)
+On Mar 18, 2016, my VIP user, AKA my dear mom, complained to me about the webpage loading really slow, and I assume this is because the server and the user are *kinda* across the Pacific. So I added the functionality of sending emails in script. (Well, these aren't always working and I am still trying to figure them out)
 
 ### Use command `mail`
 What I used is the command `mail` with `uuencode` to attach the image:
